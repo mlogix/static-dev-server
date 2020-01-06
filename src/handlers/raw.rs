@@ -1,5 +1,6 @@
 extern crate regex;
 
+use std::env;
 use std::fs;
 use std::path::Path;
 use std::convert::Infallible;
@@ -13,14 +14,25 @@ use crate::tools::mime_type;
 
 const ROOT: &str = "/";
 
-pub async fn static_handler(req: Request<Body>) -> Result<Response<Body>, Infallible> {
+pub fn static_handler(req: Request<Body>) -> Result<Response<Body>, Infallible> {
     let mut response = Response::new(Body::empty());
     let headers = response.headers_mut();
 
+    let index_file = match env::var("AMOEBA_INDEX_FILE") {
+        Ok(p) => p.parse::<String>().unwrap(),
+        Err(..) => String::from("index.html"),
+    };
+
+    let public_dir = match env::var("AMOEBA_PUBLIC_DIR") {
+        Ok(p) => p.parse::<String>().unwrap(),
+        Err(..) => String::from("public"),
+    };
+
+
     match (req.method(), req.uri().path()) {
         (&Method::GET, path) => {
-            let asset_name = if path == ROOT { "/index.html" } else { path };
-            let file_name = format!("public{}", asset_name);
+            let asset_name = if path == ROOT { format!("/{}", index_file) } else { path.to_owned() };
+            let file_name = format!("{}{}", public_dir, asset_name);
             let mime_type = mime_type::find(&file_name.to_owned());
 
             // Test path contains file extension or not. Like: `/some_assets_name.html` or `/some_path`
