@@ -2,3 +2,5 @@
 **/*.rs.bk
 /public
 /cert
+
+Cargo.lock
