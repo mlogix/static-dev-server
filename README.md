@@ -20,10 +20,10 @@ amoeba_static:
     image: logix/amoeba:latest
 
     environment:
-      - AMOEBA_PORT=8000
-      - AMOEBA_HOST=0.0.0.0
-      - AMOEBA_INDEX_FILE=index.html
-      - AMOEBA_PUBLIC_DIR=public
+      AMOEBA_PORT: 8000
+      AMOEBA_HOST: 0.0.0.0
+      AMOEBA_INDEX_FILE: 'index.html'
+      AMOEBA_PUBLIC_DIR: 'public'
 
     volumes:
       - <directory-with-static-files>:/app/public
