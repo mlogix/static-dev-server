@@ -28,25 +28,28 @@ pub fn static_handler(req: Request<Body>) -> Result<Response<Body>, Infallible> 
         Err(..) => String::from("public"),
     };
 
+    let index_page = format!("/{}", index_file);
 
     match (req.method(), req.uri().path()) {
         (&Method::GET, path) => {
-            let asset_name = if path == ROOT { format!("/{}", index_file) } else { path.to_owned() };
+            let asset_name = if path == ROOT { index_page.to_owned() } else { path.to_owned() };
             let file_name = format!("{}{}", public_dir, asset_name);
             let mime_type = mime_type::find(&file_name.to_owned());
-
             // Test path contains file extension or not. Like: `/some_assets_name.html` or `/some_path`
             let matcher = Regex::new(r".*\\/.*\\.[a-zA-Z0-9]+").unwrap();
 
-            headers.insert("Content-Type", format!("{}", mime_type).parse().unwrap());
 
             if Path::new(file_name.as_str()).exists() {
+                headers.insert("Content-Type", format!("{}", mime_type).parse().unwrap());
                 *response.body_mut() = Body::from(fs::read(file_name.as_str()).unwrap());
             } else if matcher.is_match(file_name.as_str()) {
                 *response.status_mut() = StatusCode::NOT_FOUND;
             } else {
-                headers.insert("refresh", "1; url='/".parse().unwrap());
-                *response.status_mut() = StatusCode::MOVED_PERMANENTLY;
+                let file_name = format!("{}{}", public_dir, index_page);
+                let mime_type = mime_type::find(&file_name.to_owned());
+
+                headers.insert("Content-Type", format!("{}", mime_type).parse().unwrap());
+                *response.body_mut() = Body::from(fs::read(file_name.as_str()).unwrap());
             }
 
         },
