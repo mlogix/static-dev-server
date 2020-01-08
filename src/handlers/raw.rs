@@ -35,15 +35,22 @@ pub fn static_handler(req: Request<Body>) -> Result<Response<Body>, Infallible> 
             let asset_name = if path == ROOT { index_page.to_owned() } else { path.to_owned() };
             let file_name = format!("{}{}", public_dir, asset_name);
             let mime_type = mime_type::find(&file_name.to_owned());
+
             // Test path contains file extension or not. Like: `/some_assets_name.html` or `/some_path`
             let matcher = Regex::new(r".*\\/.*\\.[a-zA-Z0-9]+").unwrap();
 
 
+            // Send resource from request if it exists.
             if Path::new(file_name.as_str()).exists() {
                 headers.insert("Content-Type", format!("{}", mime_type).parse().unwrap());
                 *response.body_mut() = Body::from(fs::read(file_name.as_str()).unwrap());
+
+            // Check the request for the file or resource address.
+            // Return NOT_FOUND in the case when requested not exist file
             } else if matcher.is_match(file_name.as_str()) {
                 *response.status_mut() = StatusCode::NOT_FOUND;
+
+            // Return index file in any cases
             } else {
                 let file_name = format!("{}{}", public_dir, index_page);
                 let mime_type = mime_type::find(&file_name.to_owned());
