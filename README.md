@@ -5,6 +5,24 @@ It is a lightweight asynchronous web server.
 Amoeba created as a development tool for serving static files only.
 You can use it "as is" as you want but WITHOUT ANY WARRANTY.
 
+### BUILD
+
+`cargo build --release --verbose`
+
+### Build Docker Image 
+
+```
+docker build -t logix/amoeba .
+docker push logix/amoeba:latest
+```
+
+# Amoeba - Node 12
+```
+docker build -f Dockerfile.node -t logix/node12-amoeba .
+docker push logix/node12-amoeba:latest
+```
+
+
 ##### HOW TO USE
 
 Launch in Docker container:
