@@ -1,7 +1,7 @@
-FROM node:12.17.0
+FROM node:12.19.0
 
 LABEL maintainer="Mykhailo Odyniuk <m.odyniuk@gmail.com>"
-LABEL version="node12-0.0.1"
+LABEL version="node12.19.0-0.0.1"
 
 ENV AMOEBA_PORT     8000
 ENV AMOEBA_HOST     0.0.0.0
